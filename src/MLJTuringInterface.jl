@@ -10,6 +10,7 @@ using Turing:
     MCMCThreads,
     DynamicPPL,
     chainscat,
+    group,
     predict,
     sample
 
@@ -48,7 +49,8 @@ function MMI.fit(tm::TuringModel, verbosity::Int, X, y)
 end
 
 function MMI.predict(tm::TuringModel, fitresult, Xnew)
-    chns = predict(tm.model, fitresult)
+    model = tm.model(Xnew, missing)
+    chns = predict(model, fitresult)
     y = mean(Array(group(chns, :y)); dims=1)
     return y
 end
