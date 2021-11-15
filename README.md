@@ -1,2 +1,3 @@
-# MLJTuringInterface.jl
-Interface for Turing models with MLJ
+# MLJ.jl <> Turing.jl
+
+Interface for Turing models with MLJ.
