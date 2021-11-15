@@ -1,3 +1,4 @@
 # MLJ.jl <> Turing.jl
 
-Interface for Turing models with MLJ.
+Interface for [Turing.jl](https://github.com/TuringLang/Turing.jl) models with [MLJ](https://github.com/alan-turing-institute/MLJ.jl).
+
