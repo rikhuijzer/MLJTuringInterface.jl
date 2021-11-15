@@ -7,7 +7,7 @@ import MLJModelInterface
 using MLJModelInterface:
     Probabilistic,
     Table,
-    Continuous
+    Continuous,
     metadata_model,
     metadata_pkg
 using Statistics: mean

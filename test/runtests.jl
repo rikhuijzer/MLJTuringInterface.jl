@@ -45,7 +45,6 @@ end
     tm = TuringModel(model, n_samples, sampler)
 
     @testset "interface" begin
-
         verbosity = 1
         fitresult, _, _ = fit(tm, verbosity, X, y)
         chns = fitresult
