@@ -1,0 +1,15 @@
+name = "MLJTuringInterface"
+uuid = "3295b728-b43a-443b-98fa-b4fa73edc511"
+authors = ["Rik Huijzer <t.h.huijzer@rug.nl>"]
+version = "0.1.0"
+
+[deps]
+MLJModelInterface = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
+
+[compat]
+MLJModelInterface = "1"
+Tables = "1"
+Turing = "0.19"
+julia = "1.6"
