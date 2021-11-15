@@ -51,7 +51,8 @@ end
 function MMI.predict(tm::TuringModel, fitresult, Xnew)
     model = tm.model(Xnew, missing)
     chns = predict(model, fitresult)
-    y = mean(Array(group(chns, :y)); dims=1)
+    y_matrix = mean(Array(group(chns, :y)); dims=1)
+    y = collect(Iterators.flatten(y_matrix))
     return y
 end
 

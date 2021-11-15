@@ -1,6 +1,10 @@
 using MLJBase:
+    CV,
+    evaluate!,
     fit,
-    predict
+    machine,
+    predict,
+    rms
 using MLJTuringInterface
 using Test
 using Turing:
@@ -21,7 +25,7 @@ function _allclose(A, B; atol=0.1)
     return true
 end
 
-@testset "interface" begin
+@testset "turinginterface" begin
     # Using centered data to speed up sampling.
     X = (; X = collect(-3:3))
     y = collect(-0.9:0.3:0.9)
@@ -40,13 +44,27 @@ end
     sampler = NUTS()
     tm = TuringModel(model, n_samples, sampler)
 
-    verbosity = 1
-    fitresult, _, _ = fit(tm, verbosity, X, y)
-    chns = fitresult
+    @testset "interface" begin
 
-    @test MLJTuringInterface._parameter_mean(chns, :intercept) ≈ 0 atol=0.05
-    @test MLJTuringInterface._parameter_mean(chns, :coef) ≈ 0.3 atol=0.05
+        verbosity = 1
+        fitresult, _, _ = fit(tm, verbosity, X, y)
+        chns = fitresult
 
-    predictions = predict(tm, chns, X)
-    @test _allclose(y, Iterators.flatten(predictions))
+        @test MLJTuringInterface._parameter_mean(chns, :intercept) ≈ 0 atol=0.05
+        @test MLJTuringInterface._parameter_mean(chns, :coef) ≈ 0.3 atol=0.05
+
+        predictions = predict(tm, chns, X)
+        @test _allclose(y, predictions)
+    end
+
+    @testset "cross-validation" begin
+        mach = machine(tm, X, y)
+        measure = rms
+        nfolds = 2
+        resampling = CV(; nfolds)
+        result = evaluate!(mach; measure, resampling)
+        # Smoke test.
+        @test length(result.fitted_params_per_fold) == nfolds
+    end
 end
+
