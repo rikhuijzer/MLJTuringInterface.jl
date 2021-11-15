@@ -14,6 +14,12 @@ using Turing:
     NUTS,
     @model
 
+"""
+    _allclose(A, B; atol=0.1)
+
+Helper function to return whether the elements in `A` and `B` are approximately equal.
+Also throws an informative error if the elements are not approximately equal.
+"""
 function _allclose(A, B; atol=0.1)
     @assert length(A) == length(B)
     for (i, t) in enumerate(zip(A, B))
