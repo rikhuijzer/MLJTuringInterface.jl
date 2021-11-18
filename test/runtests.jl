@@ -84,7 +84,7 @@ end
     @model function multivariate_regression(X, y)
         σ = 0.2
         intercept ~ Normal(0, σ)
-        coef ~ Normal(0, σ)
+        coef ~ MvNormal(size(X, 2), σ)
 
         mu = intercept .+ X * coef
         y ~ MvNormal(mu, σ^2 * I)
