@@ -2,12 +2,14 @@ using MLJBase:
     CV,
     evaluate!,
     fit,
+    fit!,
     machine,
     predict,
     rms
 using MLJTuringInterface
 using Test
 using Turing:
+    Diagonal,
     I,
     MvNormal,
     Normal,
@@ -73,3 +75,31 @@ end
     end
 end
 
+@testset "named_data" begin
+    A = collect(-3:3)
+    n = length(A)
+    B = fill(1, n)
+    X = (; A, B)
+    y = collect(-0.9:0.3:0.9)
+
+    @model function multivariate_regression(X, y)
+        σ = 0.2
+        intercept ~ Normal(0, σ)
+        d = size(X, 2)
+        coef ~ MvNormal(Diagonal(fill(σ ^ 2, d)))
+
+        mu = intercept .+ X * coef
+        y ~ MvNormal(mu, σ^2 * I)
+    end
+
+    model = multivariate_regression
+    n_samples = 100
+    sampler = NUTS()
+    renamer = Dict(["coef[$i]" => "coef[$key]" for (i, key) in enumerate(keys(X))])
+    tm = TuringModel(model, n_samples, sampler; renamer)
+    mach = machine(tm, X, y)
+    fit!(mach)
+
+    chns = mach.fitresult
+    @test MLJTuringInterface._parameter_mean(chns, "coef[A]") ≈ 0.3 atol=0.05
+end
