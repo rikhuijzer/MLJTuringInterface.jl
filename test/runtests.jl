@@ -2,6 +2,7 @@ using MLJBase:
     CV,
     evaluate!,
     fit,
+    fit!,
     machine,
     predict,
     rms
@@ -73,3 +74,27 @@ end
     end
 end
 
+@testset "named_data" begin
+    A = collect(-3:3)
+    n = length(A)
+    B = fill(1, n)
+    X = (; A, B)
+    y = collect(-0.9:0.3:0.9)
+
+    @model function multivariate_regression(X, y)
+        σ = 0.2
+        intercept ~ Normal(0, σ)
+        coef ~ Normal(0, σ)
+
+        mu = intercept .+ X * coef
+        y ~ MvNormal(mu, σ^2 * I)
+    end
+
+    model = multivariate_regression
+    n_samples = 100
+    sampler = NUTS()
+    renamer = Dict()
+    tm = TuringModel(model, n_samples, sampler; renamer)
+    mach = machine(tm, X, y)
+    fit!(mach)
+end

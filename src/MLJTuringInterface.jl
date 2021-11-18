@@ -11,6 +11,7 @@ using MLJModelInterface:
     metadata_model,
     metadata_pkg
 using Statistics: mean
+using Tables
 using Turing:
     MCMCThreads,
     DynamicPPL,
