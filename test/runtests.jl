@@ -9,6 +9,7 @@ using MLJBase:
 using MLJTuringInterface
 using Test
 using Turing:
+    Diagonal,
     I,
     MvNormal,
     Normal,
@@ -84,7 +85,8 @@ end
     @model function multivariate_regression(X, y)
         σ = 0.2
         intercept ~ Normal(0, σ)
-        coef ~ MvNormal(size(X, 2), σ)
+        d = size(X, 2)
+        coef ~ MvNormal(Diagonal(fill(σ ^ 2, d)))
 
         mu = intercept .+ X * coef
         y ~ MvNormal(mu, σ^2 * I)
@@ -93,8 +95,11 @@ end
     model = multivariate_regression
     n_samples = 100
     sampler = NUTS()
-    renamer = Dict()
+    renamer = Dict(["coef[$i]" => "coef[$key]" for (i, key) in enumerate(keys(X))])
     tm = TuringModel(model, n_samples, sampler; renamer)
     mach = machine(tm, X, y)
     fit!(mach)
+
+    chns = mach.fitresult
+    @test MLJTuringInterface._parameter_mean(chns, "coef[A]") ≈ 0.3 atol=0.05
 end

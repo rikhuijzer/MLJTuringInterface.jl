@@ -24,7 +24,7 @@ function TuringModel(model, n_samples, sampler; renamer=nothing, n_chains=3, mul
     return TuringModel(model, n_samples, sampler, renamer, n_chains, multithreaded)
 end
 
-function _parameter_mean(chns, parameter::Symbol)
+function _parameter_mean(chns, parameter)
     values = collect(Iterators.flatten(chns[parameter]))
     return mean(values)
 end
@@ -50,15 +50,16 @@ function _simplify_data(X)::Matrix
 end
 
 function MMI.fit(tm::TuringModel, verbosity::Int, X, y)
-    Xupdated = isnothing(tm.renamer) ? X : _simplify_data(X)
-    model = tm.model(Xupdated, y)
+    renamed_X = isnothing(tm.renamer) ? X : _simplify_data(X)
+    model = tm.model(renamed_X, y)
     chns = if tm.multithreaded
         sample_func(c) = sample(model, tm.sampler, tm.n_samples)
         mapreduce(sample_func, chainscat, 1:tm.n_chains)
     else
         sample(model, tm.sampler, MCMCThreads(), tm.n_samples, tm.n_chains)
     end
-    fitresult = chns
+    renamed_chns = isnothing(tm.renamer) ? chns : replacenames(chns, tm.renamer)
+    fitresult = renamed_chns
     cache = nothing
     report = nothing
 

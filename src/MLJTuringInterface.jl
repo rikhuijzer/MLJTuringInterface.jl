@@ -18,6 +18,7 @@ using Turing:
     chainscat,
     group,
     predict,
+    replacenames,
     sample
 
 const MMI = MLJModelInterface
